@@ -1,0 +1,37 @@
+import nltk
+import re
+
+def extract_text_from_resume(resume_file):
+  """Extracts text from a resume file."""
+  with open(resume_file, "rb") as f:
+    text = f.read().decode("utf-8")
+  return text
+
+def get_skills_from_resume(resume_text):
+  """Extracts skills from a resume text."""
+  skills = []
+  for sent in nltk.sent_tokenize(resume_text):
+    for word in nltk.word_tokenize(sent):
+      if word.lower() in nltk.corpus.stopwords.words("english"):
+        continue
+      if re.match(r"^\w+$", word):
+        skills.append(word)
+  return skills
+
+def find_candidate(resume_file, job_title, skills):
+  """Finds the candidate for the job based on the resume file, job title, and skills."""
+  resume_text = extract_text_from_resume(resume_file)
+  skills_in_resume = get_skills_from_resume(resume_text)
+  if job_title in resume_text and len(set(skills) & set(skills_in_resume)) >= len(skills) / 2:
+    return True
+  else:
+    return False
+
+if __name__ == "__main__":
+  resume_file = "resume.pdf"
+  job_title = "Software Engineer"
+  skills = ["Python", "Django", "Flask"]
+  if find_candidate(resume_file, job_title, skills):
+    print("The candidate is a good match for the job.")
+  else:
+    print("The candidate is not a good match for the job.")
